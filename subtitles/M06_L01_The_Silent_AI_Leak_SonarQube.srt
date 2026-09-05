@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:34,324
+Last month, a Fortune 500 company woke up to four hundred rogue GPU instances mining cryptocurrency. An autonomous AI coding agent had done it for them. The engineer asked the agent to fix a database test. The agent grepped the filesystem, found an old .env file, read the production credentials, and pasted them into a pull request description. Traditional git pre-commit hooks are completely useless here, because by the time a secret reaches git, it has already been transmitted to your LLM providers servers.
+
+2
+00:00:34,324 --> 00:01:05,044
+The only effective defense is Pre-Execution Interception. With SonarQube CLI PreToolUse hooks, we inject middleware directly between the agent and the operating system. Before the agent can execute read_file, cat, or bash, the hook intercepts the request. It checks file paths against strict blacklists and scans arguments for high-entropy tokens and AWS key signatures. If a violation is detected, the hook drops the payload and injects a synthetic permission error back into the agent.
+
+3
+00:01:05,044 --> 00:01:35,085
+Look at how gracefully the agent recovers. When SonarQube blocks the read to .env, it returns a clean, typed error message. The agent understands that the file is restricted. It does not crash; it pivots to inspecting config.example.yaml, figures out the required environment variable names, and completes the code fix without exposing a single real credential. This is the difference between brittle security and resilient governance.
+
+4
+00:01:35,085 --> 00:01:59,196
+Never rely on post-commit scanning for AI agents. Once an LLM reads a secret, that secret is already in an external prompt cache. Enforce In-Process Pre-Tool Interception to block access before file reads execute, and return clean security errors so agents can self-correct. Download the SonarQube shield script in the description, subscribe, and I will see you in the next masterclass.

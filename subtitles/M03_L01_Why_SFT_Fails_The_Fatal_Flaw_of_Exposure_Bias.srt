@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:34,351
+You spent three weeks gathering ten thousand pristine examples of expert reasoning. You spent thousands of dollars running LoRA or full-parameter Supervised Fine-Tuning on an H100 cluster. Your validation loss fell off a cliff. You deploy the model to production, ask it a coding question that varies by two words from your training set, and it confidently writes fifty lines of syntactically elegant, completely unrunnable garbage. Why? Because your model didnt learn how to think. It learned how to mimic the rhythm of someone who thinks. This is n
+
+2
+00:00:34,351 --> 00:01:11,418
+Lets look at the mathematical formulation of Supervised Fine-Tuning. Look at the loss function on screen. During training, we maximize the log-likelihood of token y_t given the prompt x and the preceding ground-truth tokens y_1 through y_{t-1}. This training technique is called Teacher Forcing. At every single step t, even if the models highest probability token was completely wrong, the training algorithm steps in, slaps the models hand, and feeds it the correct token from the dataset before asking it to predict token t+1. The model is never f
+
+3
+00:01:11,418 --> 00:01:50,053
+This mathematical pathology produces what researchers call Surface Mimicry. If you fine-tune an LLM on thousands of Chain-of-Thought solutions, the model learns the format of reasoning. It outputs <think, it says lets break this down into components, it writes step one, step two, step three. But it does not search. It does not verify. It cannot backtrack. Why? Because in an SFT dataset, human demonstrators almost never include twenty failed attempts, scratchpad deletions, and backtracks. Human datasets show clean, post-hoc rationalizations. Whe
+
+4
+00:01:50,053 --> 00:02:26,390
+This brings us to the most significant architectural realization in modern AI engineering: Reinforcement Learning is not just an alignment layer for politeness—it is the primary mechanism for acquiring reasoning capabilities. In Reinforcement Learning, the model is trained with closed-loop rollouts. The policy generates token 1, token 2, token 100, and token 500 without teacher forcing. If the model makes a mistake at step 10, it experiences the consequences of that mistake at step 500 when the final unit test fails and the reward returns zero.
+
+5
+00:02:26,390 --> 00:03:03,170
+To recap todays core architectural lessons: One: Supervised Fine-Tuning suffers from Exposure Bias due to Teacher Forcing. It creates open-loop models that cannot recover from their own errors, leading to O(\epsilon \cdot T^2) compounding error divergence. Two: SFT produces Surface Mimicry—models that look like they are reasoning, but cannot search, verify, or backtrack. Three: Complex multi-step tasks, tool-calling agents, and code generation must be trained using Reinforcement Learning over full trajectory rollouts. But how did DeepSeek train

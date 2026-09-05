@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:40,463
+If your production code repository had no Git history, no branches, and every developer pushed directly to main without code review, youd be fired by lunch. Yet right now, in 90% of enterprise AI teams, that exact catastrophe is happening to your training data. You track your 20-line PyTorch training script with fanatical precision. But the 500-gigabyte corpus of crawled web pages, user feedback logs, and synthetic instruction pairs? It lives in an S3 bucket or a Cloud Storage folder with names like training_data_final_v3_really_final.jsonl. Wh
+
+2
+00:00:40,463 --> 00:01:24,375
+To understand data versioning, you must understand the storage physics. Why cant we just use standard Git? Git was designed for text diffs. When you commit a 10-gigabyte binary file, Git attempts to compress and pack it into .git/objects. Your clone times blow up, your repo hits memory limits, and your developer workflow grinds to a halt. There are two dominant architectural solutions to this problem: First: DVC. DVC separates the data payload from the metadata. The data stays in your object store, hashed by MD5 or SHA-256. DVC writes a lightwe
+
+3
+00:01:24,375 --> 00:01:59,457
+Here is the production architecture you should deploy tomorrow: The Isolated Staging Pattern. Never, under any circumstances, allow an ETL pipeline, web scraper, or synthetic data generator to write directly to your production data branch. Instead, before your ingestion job triggers, your orchestrator calls the LakeFS API to create an ephemeral branch off main. Your ingestion writes solely to this isolated branch. Now, before that data ever touches your fine-tuning pipeline or your vector embedding index, you execute LakeFS Pre-Commit Hooks—wha
+
+4
+00:01:59,457 --> 00:02:41,880
+Look at the code on screen. This is our automated ingestion wrapper. Notice line 7: lakefs.branches.create(). This API call executes in under 15 milliseconds, even if your repository contains 50 terabytes of text. Next, our Bright Data scraper ingests the new crawled batch into staging-crawl. Now watch what happens when we inject a synthetic corruption into the batch—say, a series of truncated sentences that break syntax. Our audit function detects the anomaly: the token length entropy drops by 45%, and several records violate schema validation
+
+5
+00:02:41,880 --> 00:03:20,698
+Lets summarize the golden rules of LLMOps data engineering: One: Every training run and fine-tuning artifact must record both the Git commit hash of the training code AND the LakeFS or DVC commit hash of the dataset. If you dont have both, your experiment is not reproducible. Two: Never write to the production data branch in-place. Always write to an isolated zero-copy branch and gate merges with automated audit hooks. Three: Treat your data lineage as your first line of defense against model collapse and security exfiltration. In the next modu

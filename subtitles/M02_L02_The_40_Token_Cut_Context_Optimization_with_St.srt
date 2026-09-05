@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:34,742
+Did you know that forty percent of the tokens inside your RAG pipelines are completely useless to an LLM? When you scrape an article or index a PDF, your parser outputs markdown: bold asterisks, header hashes, embedded image URLs, bracketed links, and markdown table borders. To a human reader, that formatting is visually pleasing. To a Large Language Model calculating multi-head attention, every single bracket, link, and asterisk is a token that burns compute and accelerates the quadratic prefill wall. Today, we are looking at Strip-Markdown Co
+
+2
+00:00:34,742 --> 00:01:16,982
+Lets look at what your tokenizer actually sees when you ingest markdown. Look at this standard hyperlink: [Read the official documentation here](https://docs.enterprise-ai.com/...) The LLM only needs to know that documentation exists. But because of the URL parameters, UTM tags, and markdown syntax, your tokenizer generates thirty-two discrete tokens. More than eighty percent of those tokens provide zero reasoning value to the model. Now multiply that by ten retrieved articles in an enterprise RAG query. You are throwing thousands of tokens int
+
+3
+00:01:16,982 --> 00:01:54,494
+How do we strip markdown safely without mangling technical text like code blocks or math formulas? You cannot use naive regex substitutions. If you write a regex to strip backticks, you will accidentally corrupt executable Python code! Instead, we parse markdown into an Abstract Syntax Tree (AST) using libraries like remark or Pythons markdown-it. The AST represents the document as a structured hierarchy of nodes: heading nodes paragraph nodes code_block nodes link nodes image nodes Our optimization script traverses the AST with three strict ru
+
+4
+00:01:54,494 --> 00:02:45,720
+Lets run our optimization script from 08_VIDEO_PROJECTS/strip_markdown_optimizer.py: We load a typical web-scraped markdown article from a tech blog: it contains code snippets, tables, image badges, and twenty links. Before optimization: Raw character length: 6,420 characters. Token count under OpenAIs tokenizer: 1,612 tokens. We execute optimize_markdown_payload(raw_text): The parser strips all link URLs, eliminates formatting markup, but preserves our Python code block with mathematical exactness. After optimization: Cleaned token count: 968
+
+5
+00:02:45,720 --> 00:03:24,094
+Context engineering is not just about writing good prompts. It is about treating tokens as expensive computational currency. Clone 08_VIDEO_PROJECTS/strip_markdown_optimizer.py from our repository and add it as a preprocessing hook in your ingestion pipeline. In Episode 7, we tackle the storage tier: How to store vectors, telemetry, and relational data in a single unified database using Tiger Cloud TimescaleDB Postgres. Subscribe, and Ill see you in the next lesson.

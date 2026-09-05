@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:33,593
+Frontier models boast about one-million-token context windows. But if you have ever dumped a 500-page document into an LLM and asked it to find a needle in the haystack or perform multi-hop reasoning, you already know the ugly truth: The model forgets. It hallucinates. It hallucinates variables that dont exist. Researchers call this Context Rot. As context length scales, the transformers multi-head attention is flooded with noise, and retrieval precision collapses. Today, we are looking at a revolutionary inference-time scaling paradigm develop
+
+2
+00:00:33,593 --> 00:01:08,884
+Why does Context Rot happen? When an LLM evaluates a prompt, the softmax attention scores across all tokens must sum to one. In a small prompt of five hundred tokens, key facts receive strong, decisive attention probabilities—say, 0.40 or 0.60. When you stuff one hundred thousand tokens into the window, ninety-nine thousand of those tokens are irrelevant background noise. Every distractor token soaks up a tiny fraction of attention probability. The signal-to-noise ratio completely degrades. The models attention heads lose their sharp focus, lea
+
+3
+00:01:08,884 --> 00:01:49,453
+MIT researchers asked a brilliant question: How does a human software engineer debug a 10-million-line codebase? We dont read all ten million lines into our working memory. We open a terminal, run grep or ripgrep, partition the problem, read the exact twenty lines that matter, and reason about them! This is the foundation of Recursive Language Models (RLMs). In an RLM system: We never feed the raw text directly into the LLMs prompt window. Instead, we load the raw text as a string variable inside an isolated Python REPL sandbox. The LLM is prom
+
+4
+00:01:49,453 --> 00:02:43,395
+Lets look at the implementation in our repository under 08_VIDEO_PROJECTS/rlm_simulator.py: python class RLMSimulator: def __init__(self, raw_corpus): The entire corpus lives in the REPL sandbox environment self.env = {document: raw_corpus} def grep_tool(self, pattern): print(f[REPL] Executing regex grep: {pattern}) return [line for line in self.env[document].split(\n) if re.search(pattern, line, re.IGNORECASE)] def chunk_tool(self, size=2000): print(f[REPL] Partitioning corpus into {size}-char chunks...) doc = self.env[document] return [doc[i:
+
+5
+00:02:43,395 --> 00:03:24,355
+This concludes Module 1: Foundations of MLOps & LLMOps. Lets review the four pillars we established: 1. The Paradigm Shift: Moving from single-server tabular models to distributed clusters and PEFT. 2. The Prefill Latency Wall: Understanding why attention scales quadratically (O(T^2)) and breaks prefix caching. 3. Multi-Model Serving with SIE: Packing dozens of models onto shared GPUs with LRU eviction. 4. Recursive Language Models: Using Python REPL environments to defeat context rot over millions of tokens. In Module 2, we enter the physical

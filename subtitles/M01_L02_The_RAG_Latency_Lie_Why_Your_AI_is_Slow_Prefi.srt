@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:37,433
+If your production RAG system takes five seconds to return its very first word, stop optimizing your vector database. We see engineering teams spend weeks squeezing milliseconds out of HNSW vector indexes, swapping out embedding models, or buying enterprise cluster hardware. Then their user submits a prompt, and the chatbot sits there spinning for five full seconds before generating a single character. Your vector search took fourteen milliseconds. Your cross-encoder reranker took eighty milliseconds. That five-second delay? That was your LLM c
+
+2
+00:00:37,433 --> 00:01:13,900
+To fix latency, you must understand the two fundamentally different engines operating inside every Large Language Model: the Prefill Phase and the Decode Phase. When a user asks a question, your application wraps that question inside a system prompt and attaches retrieved document chunks. Say that totals sixteen thousand tokens. The LLM cannot generate the first output token until it has understood all sixteen thousand input tokens. To do that, the model runs the prefill phase. In prefill, all sixteen thousand tokens are fed into the GPU simult
+
+3
+00:01:13,900 --> 00:01:55,330
+Lets look at the exact mathematical reason why adding retrieved documents kills your latency. Here is the formula for the floating-point operations required by multi-head attention during prefill: C_{\text{attn}} = 4 \times L \times H \times T^2 \times d_h Where L is your layer count, H is your attention heads, d_h is the head dimension, and T is the number of tokens in your context. Notice that exponent on T: T^2. Quadratic complexity. Lets run the numbers. If your prompt has two thousand tokens, T^2 is four million operations. If you build a
+
+4
+00:01:55,330 --> 00:02:32,320
+Whenever engineers learn about this prefill bottleneck, their immediate response is: No problem! Well just turn on prefix caching in vLLM or SGLang! Modern serving frameworks use PagedAttention to cache and reuse KV caches. It works by dividing prompts into blocks of sixteen tokens. To ensure mathematical accuracy, each blocks cache hash is computed from its own tokens plus the cryptographic hash of every preceding block. This works brilliantly for static prompts—like a fixed system instruction followed by short user questions. But in real-worl
+
+5
+00:02:32,320 --> 00:03:08,578
+So how do we break the speed barrier? We stop generating tokens one by one. We implement Speculative Decoding. In traditional speculative decoding, we use a tiny, cheap draft model to predict candidate tokens, and then we let our massive target model—like a 70-billion or 400-billion parameter model—verify all those candidates in parallel in a single forward pass. If the draft model guesses right, you get four, six, or eight tokens in the time it would normally take to generate one! The Catch: Traditional draft models are autoregressive. They st
+
+6
+00:03:08,578 --> 00:03:45,018
+Now lets talk about the physical infrastructure. In any production agentic pipeline, you dont just run one large language model. You need an embedding model, a cross-encoder reranker, an entity extractor, and a guardrail classifier. Spinning up dedicated GPU instances for each small model wastes tens of thousands of dollars a month on idle hardware. This is where the open-source Superlinked Inference Engine (SIE) comes in. SIE packs dozens of specialized models onto a single shared GPU. It implements Least Recently Used (LRU) memory eviction an
+
+7
+00:03:45,018 --> 00:04:21,459
+Lets recap what we proved today: First: RAG latency is a prefill problem, not a retrieval problem. Attention FLOPs explode quadratically (O(T^2)) with context length. Second: Prefix caching fails on dynamic RAG because reordered documents bust sequential block hash chains. Third: DFlash block diffusion eliminates the sequential drafting bottleneck, generating 16 speculative tokens in a single parallel pass for a 4x throughput leap. And fourth: We can pack dozens of small specialized models onto a single GPU using Superlinkeds Inference Engine.

@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:35,552
+Take a look at this database architecture. It is an absolute operational nightmare. Teams build an agentic system and immediately fall into database sprawl. They have one database for vectors, another for time-series telemetry, a third for full-text keyword search, and a fourth for transactional relational tables. Then their synchronization pipeline lags by thirty seconds, their vector index gets out of sync with their SQL tables, and their agent hallucinates user data that was deleted five minutes ago. You do not need five databases. Today, we
+
+2
+00:00:35,552 --> 00:01:14,057
+Why is database sprawl so dangerous in LLMOps? Because AI agents require transactional consistency. If your agent is an autonomous customer service coworker, it needs to: 1. Query semantic vector embeddings to understand the users issue. 2. Match exact serial numbers or error codes using BM25 keyword search. 3. Check the real-time time-series telemetry stream of the users device from the last ten minutes. 4. Read the users billing contract from relational tables. If those four datasets live in four separate databases, your agent must execute mu
+
+3
+00:01:14,057 --> 00:01:55,670
+Enter Tiger Cloud (formerly Timescale), built directly on open-source PostgreSQL. Tiger Cloud introduces three fundamental capabilities to standard Postgres: First: Hypertables. To standard SQL queries, a hypertable looks like a normal PostgreSQL table. Under the hood, TimescaleDB automatically partitions the table across time and space into discrete chunks. This eliminates the notorious B-Tree write slowdown of traditional databases, allowing Tiger Cloud to ingest over three trillion metrics per day without performance degradation! Second: Hyp
+
+4
+00:01:55,670 --> 00:03:01,420
+Now look at search. In standard Postgres, pgvector can be slow on large-scale datasets. Tiger Cloud introduces pgvectorscale, which implements StreamingDiskANN and optimized HNSW indexing: sql SELECT t.ticket_id, t.created_at, t.error_code, c.contract_tier, -- Combined Hybrid Score (Vector Cosine + BM25 Keyword) (1 - (t.embedding <= query_vec)) 0.7 + ts_rank_cd(t.search_tsv, query_tsv) 0.3 AS hybrid_score FROM agent_telemetry_hypertbl t JOIN customer_contracts c ON t.customer_id = c.id WHERE t.created_at NOW() - INTERVAL 7 days AND t.error_code
+
+5
+00:03:01,420 --> 00:03:37,991
+Consolidating your agentic stack onto PostgreSQL with Tiger Cloud eliminates database sprawl, slashes cloud infrastructure costs, and guarantees data consistency. In our lab workbook under Module 2: Lab 2.3, you will find the complete SQL migration scripts, hypertable creation commands, and pgvectorscale index benchmarks. In Episode 8, we wrap up Module 2 with Data Versioning: using DVC and LakeFS to snapshot petabyte text corpora and model weights so your training runs are 100% reproducible. Subscribe, and Ill see you in the next lesson.

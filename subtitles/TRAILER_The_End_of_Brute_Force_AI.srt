@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:29,962
+For five years, the artificial intelligence industry told you the same story: If you want smarter AI, just build a bigger model, feed it more internet text, and burn ten thousand more GPUs. That era is over. Pretraining scaling laws have slammed into the physical wall of data exhaustion, thermal limits, and astronomical compute bills. Throwing a trillion parameters at a problem is not intelligence. It is brute force. And brute force has lost.
+
+2
+00:00:29,962 --> 00:01:00,551
+The frontier of AI is no longer about monolithic models. It is about Agentic Engineering: Data pipelines that version petabytes in milliseconds and strip context rot. Reinforcement learning with GRPO that eliminates the memory wall and unlocks self-correcting reasoning through deterministic compilers. Inference engines that shatter the memory bandwidth barrier with block diffusion. And autonomous multi-agent swarms governed by durable state graphs and unbreakable security shields.
+
+3
+00:01:00,551 --> 00:01:32,290
+Welcome to LLMOps and Agentic Engineering: From Foundation to Production-Scale Systems. This is not a tutorial on writing prompts. This is not another superficial overview of API wrappers. This is a master-level systems engineering curriculum designed for senior software engineers, infrastructure architects, and AI practitioners who are ready to build real software. Twenty-two flagship masterclasses. Deep mathematical derivations. Production code you can clone, run, and deploy to your own cluster today.
+
+4
+00:01:32,290 --> 00:01:44,803
+Stop vibe coding. Start architecting. Subscribe now, clone the repository in the description, and join the revolution. Episode 1 is live right now.

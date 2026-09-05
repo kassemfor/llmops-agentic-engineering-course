@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:36,284
+If you are still treating Large Language Models like standard machine learning models, your production systems are going to fail. For ten years, MLOps gave us a playbook: train a churn model or fraud predictor with fifty million parameters on a single GPU, validate binary accuracy or F1 score, containerize it in Docker, and retrain the whole thing overnight when the data drifts. That playbook is officially obsolete. We are no longer managing models with millions of parameters. We are deploying foundational systems with hundreds of billions to t
+
+2
+00:00:36,284 --> 00:01:09,276
+Lets look at the numbers. In traditional MLOps, a telecom churn prediction model managed ten to fifty million parameters. The model weights were two hundred megabytes. You could fit the entire model and the training batch onto an ordinary laptop GPU. In LLMOps, our baseline open-weights models start at seven billion parameters and scale past four hundred billion. A single model checkpoint in half-precision requires hundreds of gigabytes of raw VRAM just to exist in memory—before you process a single token! This leads directly to divergence numb
+
+3
+00:01:09,276 --> 00:01:57,368
+Why do traditional software engineers struggle when transitioning to LLMOps? Because they hit the physical memory wall. Lets do the arithmetic: A 70-billion parameter model stored in standard 16-bit floating point (FP16 or BF16) requires two bytes per parameter: 70 \times 10^9 \times 2 \text{ bytes} = 140 \text{ Gigabytes} The largest standard enterprise GPU on the market—an NVIDIA A100 or H100—has eighty gigabytes of VRAM. You physically cannot load the model onto a single GPU! To survive, an LLMOps engineer must master distributed infrastruct
+
+4
+00:01:57,368 --> 00:02:38,667
+To operationalize this scale, we refine the traditional DevOps infinity loop into the Nine-Stage LLMOps Lifecycle. Notice three critical additions that didnt exist in traditional software: First, The Review & Alignment Stage. Before you write code or train adapters, you must evaluate the base models zero-shot baseline against domain compliance. Second, The Packaging Phase. We dont just package a Python wheel. We containerize optimized serving engines like vLLM, SGLang, or TensorRT-LLM, configuring memory allocation fractions and KV cache budget
+
+5
+00:02:38,667 --> 00:03:13,044
+Here is your first homework assignment for the masterclass: In our GitHub workbook, we have documented the production architectures of two legendary MLOps systems: Netflixs recommendation engine and Ubers Michelangelo platform. Your task is Lab 1.0: The Breakpoint Audit. Walk through each architecture and identify the exact points where their data lakes, retraining jobs, and monitoring suites shatter when you swap out their tabular models for a 70B parameter agent. Submit your audit in the lab-submissions channel on our Discord to earn your Mod

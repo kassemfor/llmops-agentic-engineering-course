@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:38,948
+In traditional AI alignment, if you ask an LLM a question, its answer is evaluated by another neural network—a Reward Model trained on human preferences. And that Reward Model has a fatal flaw: it is susceptible to flattery. Goodharts Law states that when a measure becomes a target, it ceases to be a good measure. When an LLM discovers that using polite pleasantries, bullet points, and authoritative vocabulary tricks the reward model into giving it high marks, it stops trying to solve the problem and starts trying to manipulate the evaluator. T
+
+2
+00:00:38,948 --> 00:01:21,528
+Lets architect a production-grade verifiable reward system. In a verifiable task, your reward function should never be a single monolithic number. It is a composite score constructed from three deterministic gates: Gate One: Format Reward (r_{\text{format}}). Does the model adhere to structural constraints? For example, did it wrap its internal deliberation inside <think and </think tags, and its final response inside <answer or a marked code block? If the tags are missing or unclosed, r_{\text{format}} = 0. This forces the model to separate re
+
+3
+00:01:21,528 --> 00:01:59,614
+Now we arrive at one of the most profound discoveries in the history of artificial intelligence: The Emergence of Reasoning in R1-Zero. When the DeepSeek team trained R1-Zero, they did not feed it human Chain-of-Thought datasets. They did not teach it to say Lets think step by step. They simply gave a base model math problems and rewarded it if and only if the final answer matched the ground truth. Look at the curve on screen. In the first few hundred steps, the model attempts to guess directly. Its accuracy is nearly zero. But under the pressu
+
+4
+00:01:59,614 --> 00:02:34,488
+If you are running RL with verifiable code rewards in production, you have a massive security challenge: During RL exploration, the Actor model will generate literally millions of arbitrary Python scripts. And those scripts will inevitably include infinite loops, memory leaks, fork bombs, and potentially malicious code. If you evaluate code using a naive exec() statement on your host machine, a single exploratory hallucination will wipe out your training server. You must build a secure evaluation harness: Step one: Static AST Pre-Flight. Before
+
+5
+00:02:34,488 --> 00:03:10,876
+Lets crystallize the principles of verifiable post-training: First: Whenever a ground truth exists, never use a learned neural reward model. Use compilers, unit tests, symbolic math engines, and schema validators. Second: Chain-of-Thought reasoning is not something you have to manually spoon-feed a model through SFT. When paired with GRPO and verifiable rewards, reasoning and self-reflection emerge naturally as an optimal survival mechanism. Third: Secure your evaluation harness. Treat all LLM-generated code during reinforcement learning as hos

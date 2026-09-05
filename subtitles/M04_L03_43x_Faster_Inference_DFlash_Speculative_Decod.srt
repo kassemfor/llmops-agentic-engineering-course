@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:37,041
+For seven years, every AI engineer on earth has lived under the same physical law: To generate one hundred tokens from a transformer, you must run one hundred sequential forward passes through your model. On an eighty-billion-parameter model, every single token requires reading 160 gigabytes of weights out of GPU memory. Even on an NVIDIA H100 with 3.3 terabytes per second of memory bandwidth, physics puts an iron ceiling on your generation speed: around forty tokens per second. You cannot buy a faster GPU to fix this. Memory bandwidth is bound
+
+2
+00:00:37,041 --> 00:01:18,184
+Lets review the mathematical foundation of Speculative Decoding, first proven by Yaniv Leviathan and Google Research in 2023. The core insight is based on an asymmetric property of transformers: Generating tokens one by one is memory-bandwidth bound. But verifying tokens in parallel is compute-bound. If a small, fast draft model guesses four tokens—say, the, capital, of, France—the large 70-billion-parameter target model can verify all four tokens in a single forward pass. Because during verification, all four tokens are processed simultaneousl
+
+3
+00:01:18,184 --> 00:01:56,480
+Why didnt classic speculative decoding take over the industry two years ago? Because of The Serial Drafting Bottleneck. In traditional speculative decoding, to draft eight tokens, your draft model still has to run eight sequential autoregressive steps! Even if the draft model is a tiny 1-billion-parameter model, running eight sequential memory loads takes 25 milliseconds. By the time your draft model finishes proposing tokens, the latency savings are mostly erased. You get a 1.8x speedup—nice, but not revolutionary. This is where DFlash changes
+
+4
+00:01:56,480 --> 00:02:35,141
+Look at the production deployment commands on screen. SGLang natively integrates DFlash. Notice the flags: --speculative-algorithm dflash --speculative-num-steps 16 In this benchmark, we are serving Qwen 2.5 72B on an H100 node. Look at the acceptance metrics on our dashboard: Out of every 16 tokens proposed by DFlash in parallel, the target model accepts an average of 14.2 tokens! That means for every single forward pass through the 72-billion-parameter network, we are emitting over fourteen tokens instead of one! Think about what that does to
+
+5
+00:02:35,141 --> 00:03:15,422
+Lets summarize the high-performance serving pillar of our course: One: Compute your KV cache footprint before sizing clusters (M_{\text{bytes}} = 2 L H_{\text{kv}} d_h T b). Always utilize GQA and FP8 KV caching for long-context workloads. Two: Never inject dynamic variables at the root of a prompt. Enforce canonical chunk sorting to keep prefix cache hit rates above 85%. Three: Eliminate serial decoding bottlenecks using non-autoregressive block diffusion with DFlash to achieve 4x faster generation. You now have the fastest inference infrastru

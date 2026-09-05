@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:39,679
+When OpenAI released ChatGPT, the foundation of their alignment stack was PPO, Proximal Policy Optimization. But for seven years, engineering teams trying to run PPO on their own clusters ran into a brutal physical wall: The Four-Model Memory Wall. To train a single 70-billion parameter LLM using PPO, you must load four separate models into GPU VRAM: the Actor, the Critic, the Reference model, and the Reward model. The Critic alone doubles your GPU compute bill and requires dozens of extra H100s just to store weights and optimizer states.
+
+2
+00:00:39,679 --> 00:01:15,311
+In January 2025, DeepSeek published DeepSeek-R1 and shocked the AI world by matching closed-source frontier reasoning models. How did they afford the reinforcement learning compute? They did not optimize the Critic. They murdered the Critic. DeepSeek asked an audacious question: Why train a 70-billion-parameter neural network just to predict the average score of a prompt, when we can simply sample eight completions from the model itself and calculate the empirical average in two lines of Python?
+
+3
+00:01:15,311 --> 00:01:42,791
+Look at the mathematics on screen. We sample G outputs, evaluate their rewards, and normalize across the group. If output one scores a one point zero because it passed all unit tests, and the other seven failed with zero, output one receives a massive positive Advantage. The failed outputs get a negative Advantage. We calculate the clipped surrogate objective and enforce John Schulmans unbiased KL divergence penalty directly in the loss function without ever training a value network.
+
+4
+00:01:42,791 --> 00:02:12,702
+With GRPO, the infrastructure barrier to training reasoning models has collapsed. You can fine-tune open-source models with reinforcement learning on standard cloud instances. By pairing GRPO with deterministic compiler rewards, self-reflection and Chain-of-Thought emerge naturally as optimal survival mechanisms. Check out grpo_loss_engine.py in the description, subscribe, and lets build verifiable systems.

@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:32,600
+Anthropics Claude Code is arguably the most capable agentic coding assistant ever created. But if you run Claude Code inside a multi-million-dollar enterprise repository without configuring guardrails, you have just handed root access to a hyperactive junior engineer who has read every programming book on earth, but doesnt know your companys coding rules. In thirty seconds, it will introduce five new dependencies to solve a problem that your standard library already handles. It will mix functional patterns with object-oriented boilerplate. And
+
+2
+00:00:32,600 --> 00:01:09,302
+To understand CLAUDE.md, you have to understand how Claude Code thinks. When you launch the CLI, Claude Code looks for a file named CLAUDE.md at the root of your project. This is not standard user documentation. This is operational firmware for the AI. Whatever you put in CLAUDE.md becomes part of the models core system prompt for every tool call it makes. If you tell it: Never install an NPM package without asking, it will not install an NPM package. If you tell it: Our test runner is pnpm test:unit, it knows the exact command to verify its wo
+
+3
+00:01:09,302 --> 00:01:50,315
+Look at the four sections of a battle-tested CLAUDE.md: Section One: Explicit Build & Verification Commands. Never assume the LLM knows how to test your code. Specify the exact shell commands for unit testing, linting, and typechecking. When the agent gets stuck or introduces a type error, it can run these commands to self-correct in seconds. Section Two: Architectural Invariants & Forbidden Libraries. This is where you protect your codebase from library bloat. If your team uses date-fns, explicitly forbid moment.js. If you are on Next.js App R
+
+4
+00:01:50,315 --> 00:02:36,264
+Even with a great CLAUDE.md, models can occasionally skip instructions. That’s why modern AI engineering teams enforce Automated Tool Hooks. Claude Code supports configuration hooks in .claude/hooks.json: You can register a PostToolUse hook that runs automatically every time the agent edits a file. Look at the workflow on screen: 1. Claude edits src/utils/payment.ts. 2. Before Claude can even generate its next sentence, our local hook runs eslint and tsc. 3. If Claude introduced an unused variable or a syntax error, the hook intercepts the agen
+
+5
+00:02:36,264 --> 00:03:15,004
+To summarize our enterprise standards: One: Treat CLAUDE.md as operational firmware, not general documentation. Two: Specify exact build, lint, and test commands, and mandate that tests must pass before task completion. Three: Wire up PostToolUse hooks to catch type errors and style violations automatically. Now, what if your enterprise has sensitive intellectual property, proprietary source code, or internal architecture docs that you CANNOT send to external cloud APIs? How do you build a local-first, 100% offline agentic second brain? In Epis

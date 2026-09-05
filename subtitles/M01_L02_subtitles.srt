@@ -1,0 +1,719 @@
+1
+00:00:00,520 --> 00:00:03,840
+The huge revelation here and what they hammer home in the class is that
+
+2
+00:00:03,840 --> 00:00:07,920
+RE latency is a pre-fill problem, not a retrieval problem.
+
+3
+00:00:07,960 --> 00:00:08,460
+Yes.
+
+4
+00:00:08,680 --> 00:00:12,600
+OK, let's unpack this because to understand this, we have to look at the two distinct
+
+5
+00:00:12,600 --> 00:00:16,280
+phases of how a large language model generates text.
+
+6
+00:00:16,560 --> 00:00:18,560
+The pre-fill phase and the decode phase.
+
+7
+00:00:18,560 --> 00:00:20,280
+That's tear into the pre-fill phase first.
+
+8
+00:00:20,680 --> 00:00:25,200
+When a user sends a request to a RE system, the prompt isn't just, you know,
+
+9
+00:00:25,360 --> 00:00:26,960
+what is our Q3 strategy?
+
+10
+00:00:26,960 --> 00:00:27,460
+Right.
+
+11
+00:00:27,440 --> 00:00:31,920
+The system intercepts that question, searches the database, finds 50 pages of
+
+12
+00:00:31,920 --> 00:00:36,520
+relevant PDFs and cramps all 50 pages into the prompt alongside the question.
+
+13
+00:00:36,640 --> 00:00:41,400
+And when that massive prompt arrives at the LLM, the model must read the entire
+
+14
+00:00:41,400 --> 00:00:44,040
+input before it can generate a single word of the answer.
+
+15
+00:00:44,040 --> 00:00:44,540
+Right.
+
+16
+00:00:44,280 --> 00:00:45,160
+It doesn't just skim it.
+
+17
+00:00:45,200 --> 00:00:46,680
+No, this is the pre-fill phase.
+
+18
+00:00:46,880 --> 00:00:51,400
+The model processes every single token, every piece of every word simultaneously
+
+19
+00:00:51,400 --> 00:00:52,280
+through the neural network.
+
+20
+00:00:52,280 --> 00:00:56,120
+It does this all in parallel, which means the GPUs are just grinding at absolute
+
+21
+00:00:56,120 --> 00:00:57,160
+maximum capacity.
+
+22
+00:00:57,160 --> 00:00:58,800
+It is entirely compute bound.
+
+23
+00:00:59,120 --> 00:01:02,560
+And it scales quadratically because of the attention mechanism.
+
+24
+00:01:02,680 --> 00:01:03,640
+Oh, this is the kicker.
+
+25
+00:01:03,840 --> 00:01:05,520
+Explain the quadratic scaling.
+
+26
+00:01:05,640 --> 00:01:10,120
+So in a transformer model, every token has to look at every other token to
+
+27
+00:01:10,120 --> 00:01:11,320
+understand the context.
+
+28
+00:01:11,560 --> 00:01:15,240
+If you double the length of the prompt, you don't double the computational
+
+29
+00:01:15,240 --> 00:01:16,760
+work, you actually quadruple it.
+
+30
+00:01:16,880 --> 00:01:17,380
+Wow.
+
+31
+00:01:17,400 --> 00:01:17,900
+Yeah.
+
+32
+00:01:17,800 --> 00:01:21,880
+The GPU is doing billions of matrix multiplications all at once.
+
+33
+00:01:22,000 --> 00:01:26,720
+And the goal of all this crazy math is to generate the key value cache.
+
+34
+00:01:27,160 --> 00:01:28,280
+The KV cache.
+
+35
+00:01:28,560 --> 00:01:31,680
+We really should explain this because it's the secret to how these models
+
+36
+00:01:31,680 --> 00:01:32,640
+remember the prompt.
+
+37
+00:01:32,760 --> 00:01:33,260
+Yeah.
+
+38
+00:01:33,040 --> 00:01:37,520
+Think of the KV cache as the mathematical summary of the entire prompt as the model
+
+39
+00:01:37,520 --> 00:01:42,840
+processes those 50 pages, it calculates the keys and values for every single word,
+
+40
+00:01:42,920 --> 00:01:46,840
+which is essentially plotting out how each word relates to the others in
+
+41
+00:01:46,840 --> 00:01:48,040
+multi-dimensional space.
+
+42
+00:01:48,080 --> 00:01:48,680
+Exactly.
+
+43
+00:01:48,680 --> 00:01:53,480
+It stores this massive mathematical map in the GPU's memory so that it doesn't
+
+44
+00:01:53,480 --> 00:01:55,400
+have to reread the 50 pages ever again.
+
+45
+00:01:55,480 --> 00:01:55,980
+Okay.
+
+46
+00:01:55,720 --> 00:01:57,160
+So the pre-fill phase is complete.
+
+47
+00:01:57,400 --> 00:01:58,680
+The compute was super heavy.
+
+48
+00:01:58,880 --> 00:02:00,200
+The KV cache is built.
+
+49
+00:02:00,480 --> 00:02:04,120
+Now we enter the decode phase where the model actually starts talking back to you.
+
+50
+00:02:04,280 --> 00:02:06,600
+It generates the first word of the answer.
+
+51
+00:02:06,640 --> 00:02:10,440
+But this phase operates under completely different laws of physics, doesn't it?
+
+52
+00:02:10,440 --> 00:02:11,520
+Completely different.
+
+53
+00:02:11,520 --> 00:02:14,120
+The decode phase is not compute bound at all.
+
+54
+00:02:14,160 --> 00:02:14,840
+Wait, really?
+
+55
+00:02:14,920 --> 00:02:15,420
+Yeah.
+
+56
+00:02:15,360 --> 00:02:16,800
+It is memory bandwidth bound.
+
+57
+00:02:17,200 --> 00:02:21,000
+The actual GPU compute cores are barely breaking a sweat.
+
+58
+00:02:21,320 --> 00:02:22,160
+Why is that?
+
+59
+00:02:22,400 --> 00:02:28,040
+Because the KV cache already exists to generate the next word, the model doesn't
+
+60
+00:02:28,040 --> 00:02:29,120
+look at the prompt again.
+
+61
+00:02:29,120 --> 00:02:33,800
+It just takes the newly generated word, calculates its specific key in value and
+
+62
+00:02:33,800 --> 00:02:35,120
+appends it to the cache.
+
+63
+00:02:35,120 --> 00:02:37,600
+Ah, so the arithmetic is incredibly light.
+
+64
+00:02:37,640 --> 00:02:38,200
+Very light.
+
+65
+00:02:38,320 --> 00:02:40,240
+But here is the massive traffic jam.
+
+66
+00:02:40,280 --> 00:02:40,780
+Right.
+
+67
+00:02:40,600 --> 00:02:45,120
+To calculate that one new word, the GPU still has to stream the entire neural
+
+68
+00:02:45,120 --> 00:02:46,120
+network's weights.
+
+69
+00:02:46,320 --> 00:02:51,400
+Let's say 14 gigabytes of data for a medium size model from the memory chips
+
+70
+00:02:51,440 --> 00:02:55,000
+into the processing cores for every single word for every single word.
+
+71
+00:02:55,040 --> 00:02:59,280
+You are moving 14 gigabytes of data across the motherboard just to produce a
+
+72
+00:02:59,280 --> 00:03:00,400
+fraction of a syllable.
+
+73
+00:03:00,440 --> 00:03:01,840
+That is insane.
+
+74
+00:03:01,880 --> 00:03:06,040
+So the GPU cores are literally sitting idle for milliseconds at a time, just
+
+75
+00:03:06,040 --> 00:03:08,040
+waiting for the data to arrive from the memory.
+
+76
+00:03:08,240 --> 00:03:12,120
+Yeah, I want to use an analogy here to cement this because it's so counter
+
+77
+00:03:12,120 --> 00:03:14,200
+intuitive to how we normally think about computers.
+
+78
+00:03:14,200 --> 00:03:14,720
+Go for it.
+
+79
+00:03:15,080 --> 00:03:18,760
+The pre-fill phase is like sitting down to read an entire encyclopedia.
+
+80
+00:03:18,800 --> 00:03:19,300
+Right.
+
+81
+00:03:19,200 --> 00:03:20,960
+It requires massive brain power.
+
+82
+00:03:21,160 --> 00:03:24,880
+You were concentrating incredibly hard, but you process the whole thing in one
+
+83
+00:03:24,880 --> 00:03:25,640
+giant sitting.
+
+84
+00:03:25,680 --> 00:03:26,180
+Right.
+
+85
+00:03:26,200 --> 00:03:30,680
+The decode phase is like writing the sequel to that encyclopedia, one single
+
+86
+00:03:30,680 --> 00:03:31,400
+word at a time.
+
+87
+00:03:31,440 --> 00:03:31,940
+Okay.
+
+88
+00:03:31,960 --> 00:03:35,560
+But for every single word you write, you are forced to walk all the way
+
+89
+00:03:35,560 --> 00:03:39,720
+across town to the library, fetch the original encyclopedia, carry it back to your
+
+90
+00:03:39,720 --> 00:03:42,600
+desk, write your one word, and then return the book.
+
+91
+00:03:42,640 --> 00:03:43,200
+Yes.
+
+92
+00:03:43,360 --> 00:03:47,440
+And you have to do that walk across town for the next word and the next.
+
+93
+00:03:47,520 --> 00:03:49,240
+That is a perfect analogy.
+
+94
+00:03:49,480 --> 00:03:52,400
+The walking across town is the memory bandwidth bottleneck.
+
+95
+00:03:52,880 --> 00:03:57,520
+This asymmetry explains a fundamental rule of LLM ups that a lot of people miss.
+
+96
+00:03:58,200 --> 00:04:03,160
+Batching multiple user requests together helps the decode phase immensely, but does
+
+97
+00:04:03,160 --> 00:04:04,880
+almost nothing for the pre-fill phase.
+
+98
+00:04:05,160 --> 00:04:05,660
+Right.
+
+99
+00:04:05,680 --> 00:04:09,480
+Because if you are walking to the library anyway, you might as well fetch the
+
+100
+00:04:09,480 --> 00:04:13,720
+information needed to write 64 different words for 54 different users all at once.
+
+101
+00:04:14,120 --> 00:04:15,400
+You share the cost of the commute.
+
+102
+00:04:15,440 --> 00:04:16,120
+Exactly.
+
+103
+00:04:16,120 --> 00:04:19,760
+But during pre-fill, your brain is already maxed out reading that first
+
+104
+00:04:19,760 --> 00:04:24,640
+encyclopedia, adding a second users encyclopedia at the same time will just
+
+105
+00:04:24,640 --> 00:04:25,560
+crash your brain.
+
+106
+00:04:25,680 --> 00:04:30,160
+Therefore, when a rag application is slow, it isn't the database search.
+
+107
+00:04:30,600 --> 00:04:35,760
+It is the model choking on the compute heavy pre-fill phase as it tries to
+
+108
+00:04:35,760 --> 00:04:40,640
+quadratically process the 50 pages of PDFs you just dumped into its prompt.
+
+109
+00:04:41,080 --> 00:04:42,200
+So how do we fix it?
+
+110
+00:04:42,400 --> 00:04:42,900
+Yeah.
+
+111
+00:04:42,600 --> 00:04:44,880
+Because we can't just stop feeding the model context.
+
+112
+00:04:44,880 --> 00:04:45,380
+No.
+
+113
+00:04:45,160 --> 00:04:46,160
+You need the context.
+
+114
+00:04:46,160 --> 00:04:46,660
+Right.
+
+115
+00:04:46,400 --> 00:04:51,120
+So the master class tackles this by introducing bleeding edge inference engines
+
+116
+00:04:51,680 --> 00:04:55,880
+and a technique called speculative decoding, specifically focusing on a
+
+117
+00:04:55,880 --> 00:04:57,400
+technology called D flash.
+
+118
+00:04:57,640 --> 00:05:01,280
+Speculative decoding is I think one of the most brilliant architectural
+
+119
+00:05:01,280 --> 00:05:02,880
+workarounds we've seen in the last year.
+
+120
+00:05:03,160 --> 00:05:08,080
+We know the massive 14 gigabyte model is slow at generating text because
+
+121
+00:05:08,080 --> 00:05:09,760
+fetching the weights takes so long.
+
+122
+00:05:10,040 --> 00:05:14,320
+So instead of asking the massive model to generate the text one word at a
+
+123
+00:05:14,320 --> 00:05:20,400
+time, we introduce a tiny secondary draft model, a much smaller model that
+
+124
+00:05:20,400 --> 00:05:22,360
+can hold its entire weight in the fast cache.
+
+125
+00:05:22,360 --> 00:05:23,080
+Exactly.
+
+126
+00:05:23,360 --> 00:05:29,160
+This tiny draft model races ahead and guesses the next say 15 tokens almost instantly.
+
+127
+00:05:29,280 --> 00:05:29,780
+Okay.
+
+128
+00:05:29,680 --> 00:05:30,280
+But it's small.
+
+129
+00:05:30,280 --> 00:05:32,000
+So the guesses might not be perfectly accurate.
+
+130
+00:05:32,040 --> 00:05:32,540
+Right.
+
+131
+00:05:32,600 --> 00:05:33,680
+But they are fast.
+
+132
+00:05:33,960 --> 00:05:39,000
+Then it hands those 15 guest tokens to the massive slow model.
+
+133
+00:05:39,080 --> 00:05:40,280
+And here's the magic trick.
+
+134
+00:05:40,880 --> 00:05:43,840
+The massive model doesn't have to evaluate them one by one.
+
+135
+00:05:44,080 --> 00:05:49,240
+It evaluates all 15 tokens simultaneously because verifying text acts exactly like a
+
+136
+00:05:49,240 --> 00:05:49,880
+pre-fill step.
+
+137
+00:05:49,920 --> 00:05:50,420
+Yes.
+
+138
+00:05:50,600 --> 00:05:51,520
+It does it in parallel.
+
+139
+00:05:51,800 --> 00:05:56,040
+If the tiny model just perfectly, you just generated 15 tokens in the time it
+
+140
+00:05:56,040 --> 00:05:57,200
+usually takes to generate one.
+
+141
+00:05:57,240 --> 00:05:58,520
+That is a massive speed up.
+
+142
+00:05:58,600 --> 00:06:03,120
+And even if the tiny model gets wrong on say the fifth token, the massive model
+
+143
+00:06:03,120 --> 00:06:07,240
+corrects it, throws away the rest of the guesses and you still gained four perfectly
+
+144
+00:06:07,240 --> 00:06:08,920
+generated tokens essentially for free.
+
+145
+00:06:09,120 --> 00:06:09,960
+It's astonishing.
+
+146
+00:06:10,280 --> 00:06:12,240
+And D flash takes this a step further, doesn't it?
+
+147
+00:06:12,240 --> 00:06:12,740
+It does.
+
+148
+00:06:12,720 --> 00:06:14,320
+It isn't just a standard draft model.
+
+149
+00:06:14,320 --> 00:06:18,480
+It's a lightweight block diffusion model designed specifically for this drafting
+
+150
+00:06:18,480 --> 00:06:19,080
+process.
+
+151
+00:06:19,360 --> 00:06:22,400
+It enables highly efficient parallel drafting.
+
+152
+00:06:22,560 --> 00:06:27,320
+And the curriculum shows how to wire D flash directly into modern serving
+
+153
+00:06:27,320 --> 00:06:33,200
+engines like VLLM, SG Lang, and even MLX for developers running local models
+
+154
+00:06:33,360 --> 00:06:36,480
+on Apple Silicon, which is huge for local development.
+
+155
+00:06:36,520 --> 00:06:39,640
+But you know, having a lightning fast model is only half the battle.
+
+156
+00:06:39,720 --> 00:06:40,220
+Right.
+
+157
+00:06:40,120 --> 00:06:43,720
+If you are building an actual AI agent, you don't just need one model.
+
+158
+00:06:43,720 --> 00:06:47,720
+You need an entire ecosystem of specialized models working together, which
+
+159
+00:06:47,800 --> 00:06:49,960
+introduces just a horrific DevOps nightmare.
+
+160
+00:06:50,000 --> 00:06:50,800
+Oh, the worst.
+
+161
+00:06:51,320 --> 00:06:54,680
+Let's look at what a real world autonomous agent actually has to do.
+
+162
+00:06:55,160 --> 00:06:58,520
+It needs to search internal databases, which requires an embedding model.
+
+163
+00:06:59,040 --> 00:07:02,840
+It needs to read scanned PDFs, which requires a specialized document
+
+164
+00:07:02,840 --> 00:07:04,120
+parsing OCR model.
+
+165
+00:07:04,600 --> 00:07:08,760
+It needs to output data in strict JSON formats, requiring an extraction model.
+
+166
+00:07:08,920 --> 00:07:11,720
+It needs safety guardrails, requiring a moderation model.
+
+167
+00:07:11,760 --> 00:07:15,080
+And it needs the main heavy duty LOM for its reasoning loop.
+
+168
+00:07:15,280 --> 00:07:19,440
+Traditionally, a backend engineer would have to provision five different cloud
+
+169
+00:07:19,440 --> 00:07:25,000
+servers, manage five different endpoints, handle scaling and load balancing for each
+
+170
+00:07:25,000 --> 00:07:31,040
+one independently, and track the latency across the entire messy network.
+
+171
+00:07:31,120 --> 00:07:32,520
+That sounds incredibly fragile.
+
+172
+00:07:32,520 --> 00:07:33,020
+It is.
+
+173
+00:07:32,920 --> 00:07:33,920
+It breaks all the time.
+
+174
+00:07:34,400 --> 00:07:39,000
+But the solution presented in the architecture modules is super linked SIE,
+
+175
+00:07:39,200 --> 00:07:40,720
+the self hosted inference engine.
+
+176
+00:07:40,920 --> 00:07:42,560
+SIE is a game changer.
+
+177
+00:07:42,760 --> 00:07:46,920
+It solves this fragmentation by unifying all of those disparate models into a
+
+178
+00:07:46,920 --> 00:07:50,680
+single cohesive cluster running behind one unified API.
+
+179
+00:07:50,920 --> 00:07:53,520
+It can run over 100 swappable models on demand.
+
+180
+00:07:53,800 --> 00:07:58,040
+And the specific open source models they deploy within SIE are fascinating.

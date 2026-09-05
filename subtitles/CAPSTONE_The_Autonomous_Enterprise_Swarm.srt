@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:30,928
+For the past two years, the technology world has been seduced by the illusion of vibe coding, the belief that building AI systems simply means writing clever prompts. But you know the truth. You know that real enterprise AI is an engineering discipline governed by compute, memory bandwidth, and distributed consensus. Today, we bring every single one of these systems together into a unified, self-healing production cluster: The Autonomous Enterprise Swarm.
+
+2
+00:00:30,928 --> 00:01:04,313
+Look at the master topology on screen. In our scenario, an enterprise payment API suffers schema drift at 2 AM. TimescaleDB records the anomaly. Our Ingestion Agent flags the error spike and triggers Google ADK 2.0. Plano Proxy routes diagnostic queries to our local fast 4B model in 14 milliseconds. The Diagnostic Agent isolates a LakeFS data branch and routes fix drafting to our fine-tuned GRPO reasoning model, generating code at 160 tokens per second with DFlash.
+
+3
+00:01:04,313 --> 00:01:36,783
+When the agent attempts to inspect production Stripe keys, SonarQube Shield blocks the read in zero point eight milliseconds. The agent safely falls back to test fixtures. It runs eighteen unit tests in an isolated sandbox. Every assertion passes. Because the dollar impact exceeds threshold, ADK triggers native suspend. A notification arrives on the lead architects phone. One tap on approve resumes ADK. Doc Holiday drafts the pull request, updates the docs, and deploys to staging.
+
+4
+00:01:36,783 --> 00:02:04,473
+You have reached the summit of this masterclass. You started in a world dominated by brute force, trillion-parameter models, and five-second RAG latencies. Today, you leave as an Agentic Systems Architect. The code, the docker manifests, the scripts, and the lab workbooks are in your hands. Fork the GitHub repository, deploy the Capstone cluster, submit your completion certificate in our Discord community, and welcome to the era of Agentic Engineering.

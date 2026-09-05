@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:34,873
+Autonomous AI coding agents have supercharged software development. Your team is merging four times as many pull requests as you were two years ago. But there is a dirty secret about high-velocity AI teams: Nobody is writing documentation. Engineers are shipping features so fast that your README files are obsolete, your API references are missing new parameters, and your changelog hasnt been updated in four months. When you change an endpoint schema, your frontend developers find out when their builds fail in staging. When you introduce a break
+
+2
+00:00:34,873 --> 00:01:18,785
+Most automated documentation tools fail because they simply dump raw git commit messages into an LLM. And what do real git commits look like? fix bug, wip, almost done, asdf. If you feed that to an AI, you get garbage release notes. Doc Holiday operates differently. It doesnt rely on commit messages. It analyzes the code diff itself. It parses the Abstract Syntax Tree of the repository: - Did a TypeScript interface change a field from optional to required? - Did a FastAPI route add a new query parameter? - Did an SQL migration alter a table con
+
+3
+00:01:18,785 --> 00:01:56,506
+Look at the simplicity of this CI/CD pipeline. Whenever code is merged into main or a new release tag is pushed: Doc Holiday triggers inside GitHub Actions. Notice line 19: it connects to our Plano AI Edge Proxy, using our local fast model to keep CI costs at fractions of a cent. Watch what happens when a pull request refactoring our payment processing is merged: Doc Holiday detects that amount_cents was renamed to amount_in_cents in our database model. In eight seconds, Doc Holiday: 1. Formats a pristine changelog entry in CHANGELOG.md. 2. Fla
+
+4
+00:01:56,506 --> 00:02:33,626
+Take a step back and look at the architecture we have built together across these six modules. We did not build a collection of disconnected toy scripts. We built a Unified Enterprise Agentic Operating System: - A data ingestion foundation that extracts web data cleanly, cuts tokens by 40%, and guarantees cryptographic dataset versioning. - A post-training brain trained with GRPO and verifiable compilers, unlocking autonomous reasoning without human preference bias. - A high-performance serving engine that defies the memory wall with DFlash spe

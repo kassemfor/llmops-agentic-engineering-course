@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:45,009
+You read the vLLM and SGLang documentation. You saw that prefix caching can eliminate 90% of your prefill compute by reusing KV caches across requests. You enabled the --enable-prefix-caching flag. You deployed it to your production enterprise RAG application. You open your Grafana dashboard, check your prefix cache hit rate, and your heart sinks: Zero percent. Your Time-to-First-Token is still hovering at five seconds. Your GPUs are still pegging at 100% compute during prefill. You ask yourself: Did the flag not work? Is vLLM broken? vLLM is n
+
+2
+00:00:45,009 --> 00:01:21,293
+To understand why prefix caching fails, you must understand how an inference engine identifies identical text. An inference engine like vLLM doesnt do a fuzzy string match. It uses cryptographic block hashing. PagedAttention divides your context into discrete token blocks—typically 16 or 32 tokens per block. Look at the hash chain on screen. To compute the identifier for Block 0, it hashes the 16 tokens in Block 0. But for Block 1, the hash is NOT just the tokens of Block 1. It is a hash of the tokens of Block 1 concatenated with the hash of Bl
+
+3
+00:01:21,293 --> 00:02:06,955
+Now you see why dynamic RAG causes prefix caching to collapse. It boils down to two deadly architectural sins: Deadly Sin Number One: Dynamic Metadata Injection at the Prefix. Many popular RAG frameworks inject dynamic strings right at the very top of the system prompt: The current date and time is September 5th, 2026, 12:15:32. Or: User Session ID: 9f8a-4c2b. Because this dynamic string lives at token zero, Block 0 changes with every single query. And because of the sequential hash chain, once Block 0 changes, the hashes for the subsequent 15,
+
+4
+00:02:06,955 --> 00:02:44,336
+Here is the production fix. It requires zero changes to vLLM, zero changes to your infrastructure, and thirty lines of Python in your orchestrator. We call this the Strict Prompt Topology Pattern: Rule One: Never put dynamic variables at the root of the prompt. Strip all timestamps, user IDs, and session tokens from your system prompt. Move them to the absolute suffix of the request. Rule Two: Canonical Document Sorting. When your vector database returns retrieved chunks, never concatenate them in the raw order returned by the similarity search
+
+5
+00:02:44,336 --> 00:03:23,154
+Lets summarize: One: Prefix caching is bounded by cryptographic sequential hash chains: H_N = \text{SHA256}(H_{N-1} \parallel \text{Tokens}_N). Two: A single dynamic timestamp at token zero destroys the entire hash chain for the entire context. Three: Always enforce canonical document sorting and push dynamic metadata to the suffix. But optimizing the prefill phase is only half the battle. Once the prefill phase is done, your model enters the decode phase—generating tokens one by one, hitting the memory bandwidth wall. What if you could generat

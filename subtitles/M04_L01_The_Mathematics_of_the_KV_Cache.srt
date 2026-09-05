@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:32,600
+You just spent eighty thousand dollars on an NVIDIA H100 server. You load your shiny new 70-billion-parameter model behind an API with a 64k context window. Five users hit your API at the same time. Instantly, your server crashes with a CUDA Out of Memory error. GPU compute utilization was at eight percent. What killed your server was not compute. What killed your server was the silent, voracious monster of transformer inference: The Key-Value Cache.
+
+2
+00:00:32,600 --> 00:01:09,250
+Let us derive the exact physics of the KV cache. For every token, we store two vectors: Key and Value. Across 80 layers, 8 key-value heads, with a head dimension of 128, at 2 bytes per float. That is 320 kilobytes of VRAM for every single token! If a user submits a 32,000-token prompt, that single user consumes over 10 gigabytes of VRAM. An 80-gigabyte GPU holding 70 gigabytes of model weights can serve exactly one user at a 32k context before running out of memory.
+
+3
+00:01:09,250 --> 00:01:45,586
+How does modern AI infrastructure survive this memory wall? Three critical innovations: First, Grouped-Query Attention shares one key-value head across eight query heads, slashing cache size by 87.5%. Second, FP8 KV cache quantization cuts memory in half again with virtually zero perplexity loss. Third, DeepSeeks Multi-Head Latent Attention compresses the key-value cache into a 512-dimensional latent vector, achieving a 93% memory reduction and quadrupling concurrent user capacity.
+
+4
+00:01:45,586 --> 00:02:08,261
+Remember this fundamental law of LLMOps serving: During generation, your model is not bounded by FLOPs, it is bounded by memory bandwidth and VRAM capacity. Always model your KV cache footprint before sizing clusters. Use our open-source kv_cache_calculator.py in the description to profile your hardware, subscribe, and I will see you in the next masterclass.

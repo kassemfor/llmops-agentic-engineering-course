@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:35,683
+Look at this cloud compute bill. Four thousand two hundred dollars a month. Why? Because an engineering team wanted to build an agentic search system. They spun up one GPU instance for their dense embedding model. Another GPU instance for their cross-encoder reranker. A third instance for an entity extractor. And a fourth instance for content moderation. Four separate A10G instances burning money 24 hours a day, while their actual GPU compute utilization never exceeds eight percent! This is the GPU Resource Fragmentation Trap. Today, we are eli
+
+2
+00:00:35,683 --> 00:01:14,422
+In any modern agentic application, your primary large language model is only the tip of the iceberg. Behind the scenes, you need an entire symphony of small, specialized models: 1. An embedding model like all-MiniLM-L6-v2 or BGE-M3 to generate search vectors. 2. A cross-encoder model like ms-marco-MiniLM to rerank search results with extreme precision. 3. A zero-shot Named Entity Recognition model like GLiNER to pull variables and dates out of raw text. 4. A safety guardrail model like Granite Guardian 2B to block toxic outputs. None of these m
+
+3
+00:01:14,422 --> 00:01:53,371
+Enter the Superlinked Inference Engine (SIE)—an Apache 2.0 open-source inference server designed specifically for shared-GPU multi-model packing. SIE solves the fragmentation crisis through three architectural pillars: First: Uniform Functional Primitives. Instead of learning custom API schemas for twenty different libraries, SIE standardizes model interaction into three universal verbs: encode: Converts text or images to vectors for semantic search. score: Computes relevance scores between query-document pairs for reranking. extract: Pulls str
+
+4
+00:01:53,371 --> 00:02:37,858
+Lets look at the Python client code: We import SIEClient and initialize it against our local endpoint: http://localhost:8080. Notice how clean this pipeline is: Step one: We call client.encode() with all-MiniLM-L6-v2. In twelve milliseconds, we receive a normalized 384-dimensional embedding vector. Step two: We execute cross-encoder document reranking. We pass our query: What causes the 5-second TTFT latency in RAG?, along with three candidate chunks. We call client.score(). SIE scores the candidates, placing our prefill attention explanation a
+
+5
+00:02:37,858 --> 00:03:16,467
+By deploying the Superlinked Inference Engine, we reduced our monthly hardware footprint from four instances down to one, slashing our infrastructure spend by over seventy-five percent. In our repository under 08_VIDEO_PROJECTS/sie_pipeline.py, you can download the exact script and docker configuration. Your challenge for this episode: Deploy sie-server locally using Docker or Metal on Apple Silicon, add a sentiment classification model to the pipeline, and measure the warm latency when switching between embedding and classification tasks. In E

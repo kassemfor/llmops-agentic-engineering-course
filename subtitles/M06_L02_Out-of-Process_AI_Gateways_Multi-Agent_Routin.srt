@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:36,858
+If you have Python code in your production microservices that directly imports openai or anthropic, instantiates client objects, and hardcodes fallback logic—you are committing the exact same architectural sin that web engineers solved fifteen years ago. Imagine if every single endpoint in your backend had to manually implement TLS termination, TCP keep-alives, rate limiting, and DDoS protection. You wouldnt do that. You put NGINX or Envoy in front of your servers. Yet right now, enterprise AI teams are embedding API keys, retry loops, rate-lim
+
+2
+00:00:36,858 --> 00:01:19,699
+Look at the architectural transformation on screen. Your agent code no longer imports specific vendor SDKs. It connects to a single, standardized endpoint: http://plano:8080/v1. Your application doesnt know—and doesnt care—whether the underlying model is running on AWS Bedrock, Google Vertex AI, Anthropic, or an open-source vLLM node in your own basement. All networking logic is handled by Plano, running on Envoy’s battle-tested C++ networking core. When a request enters Plano: One: Zero-Trust Secret Injection. Your application code never holds
+
+3
+00:01:19,699 --> 00:01:58,491
+Look at the clarity of this declarative manifest. Look at lines 10 through 17: We define a routing rule based on agent intent: If an agent tags its request as fast, Plano directs it to our local Superlinked Inference Engine cluster hosting a 4-billion parameter model. Zero external cloud fees. Look at line 15: If our primary frontier model fails three consecutive times with a 5xx status, the circuit breaker trips. Plano instantly ejects the failing provider for thirty seconds and reroutes 100% of traffic to our fallback cluster. And look at the
+
+4
+00:01:58,491 --> 00:02:37,204
+Watch what happens in our live test. On the top screen, our multi-agent workflow is firing twenty requests per second through Plano Proxy. Now, on the bottom left, we simulate an outage: we sever the connection to Provider A. Look at the Grafana dashboard: Request 1 fails. Request 2 fails. Request 3 fails. In four milliseconds, Plano’s circuit breaker trips. Look at the green line on the dashboard: 100% of outbound requests seamlessly shift to Provider B. Look at the agent application log: Not a single exception was thrown. Not a single user re
+
+5
+00:02:37,204 --> 00:03:15,108
+Lets review the architectural rules of AI gateways: One: Never embed vendor SDKs, API keys, or fallback loops in your core business logic. Route all AI traffic through an out-of-process reverse proxy. Two: Use dynamic semantic routing to offload lightweight agent queries to fast local models, reserving frontier reasoning models for complex tasks. Three: Implement circuit breaking and zero-code OpenTelemetry at the proxy tier for bulletproof enterprise reliability. Now, once your agents are running, code is being written, models are being served

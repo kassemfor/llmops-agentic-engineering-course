@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:29,074
+If your autonomous AI agent runs inside a Python while loop, you do not have an enterprise system. You have a ticking financial time bomb. When Kubernetes reschedules a pod or a network socket drops, your in-memory Python variables evaporate. The agent restarts from token zero and executes step one all over again, charging your customer twice or corrupting your database. This is why vibe coding fails the moment it meets enterprise reality.
+
+2
+00:00:29,074 --> 00:01:05,175
+In Google ADK 2.0, an agent is not a prompt with a list of tools. An agent is a Directed State Machine. Every phase is an explicit node. When an agent hits a step requiring human executive sign-off, it invokes context dot suspend. ADK takes a cryptographic snapshot of the session state, writes it to PostgreSQL, and shuts down the worker process. It consumes zero CPU and zero RAM while waiting. Three days later, when a manager approves the request, a webhook deserializes the state and execution resumes instantly.
+
+3
+00:01:05,175 --> 00:01:42,713
+Look at the code from our adk_durable_graph.py project. We mark the manager approval node with is_interrupt equals True. When a 7,500-dollar refund request arrives, the conditional edge routes to approval. The process saves checkpoint chk_89f3a1 and exits cleanly. We simulate killing the server. Then we resume via webhook. The agent does not re-run the audit; it immediately executes the payout and logs the approvers identity. That is enterprise durability.
+
+4
+00:01:42,713 --> 00:02:05,727
+Never run multi-step agents in ephemeral in-memory loops. Model all mission-critical workflows as directed state graphs. Persist checkpoints to an external database, and leverage native graph suspension to eliminate idle compute costs while guaranteeing zero duplicate actions. Download the ADK code in the description, subscribe, and let us build durable agents.
