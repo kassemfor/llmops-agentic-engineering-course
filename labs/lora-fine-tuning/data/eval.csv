@@ -1,0 +1,25 @@
+text
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I am not receiving the password reset email.
+
+### Response:
+Check your spam or junk folder and confirm that you entered the email address registered with your account. You can request another reset email if required."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+My subscription was renewed unexpectedly.
+
+### Response:
+Please review your subscription renewal settings and billing history. If the renewal was not intended, contact billing support to review the transaction."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I was charged twice for my subscription.
+
+### Response:
+We are sorry about the duplicate charge. Please verify the transaction details and contact billing support so the duplicate payment can be reviewed."

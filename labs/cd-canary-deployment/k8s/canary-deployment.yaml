@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: llm-canary
+
+spec:
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: gemini-llm
+      track: canary
+
+  template:
+
+    metadata:
+      labels:
+        app: gemini-llm
+        track: canary
+
+    spec:
+
+      containers:
+
+        - name: app
+
+          image: gemini-canary-demo:1.0
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+
+            - containerPort: 8000
+
+          env:
+
+            - name: GEMINI_API_KEY
+
+              valueFrom:
+
+                secretKeyRef:
+                  name: gemini-api-secret
+                  key: GEMINI_API_KEY
+
+
+            - name: MODEL_NAME
+
+              value: "gemini-3.5-flash-lite"
+
+
+            - name: PROMPT_VERSION
+
+              value: "v2"
+
+
+            - name: RELEASE_NAME
+
+              value: "canary"

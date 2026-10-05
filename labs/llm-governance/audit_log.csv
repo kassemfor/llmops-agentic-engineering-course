@@ -1,0 +1,5 @@
+timestamp,user,role,action,decision
+2026-09-22T16:17:40,Alice,Admin,update_model,ALLOWED
+2026-09-22T16:17:40,Bob,Developer,run_model,ALLOWED
+2026-09-22T16:17:40,Carol,Viewer,run_model,DENIED
+2026-09-22T16:17:40,David,Viewer,view_results,ALLOWED

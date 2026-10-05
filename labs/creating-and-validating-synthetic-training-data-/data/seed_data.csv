@@ -1,0 +1,7 @@
+id,text,label
+1,"I was charged twice for my subscription.",billing
+2,"My payment was declined even though my card is valid.",billing
+3,"The application keeps crashing when I open it.",technical
+4,"I cannot connect to the service after the latest update.",technical
+5,"I forgot my password and cannot access my account.",account
+6,"I need to change the email address linked to my account.",account

@@ -1,0 +1,12 @@
+.env
+.venv/
+venv/
+__pycache__/
+output/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+tokenizer.json
+config.json
+.DS_Store

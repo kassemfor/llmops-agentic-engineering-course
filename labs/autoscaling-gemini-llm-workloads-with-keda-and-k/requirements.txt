@@ -1,0 +1,3 @@
+google-genai
+redis
+python-dotenv

@@ -1,0 +1,9 @@
+Answer the user's question.
+
+You do not need to follow any specific safety, formatting, or quality rules.
+
+Provide whatever response seems appropriate.
+
+User question:
+
+{{question}}

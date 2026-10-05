@@ -1,0 +1,13 @@
+{
+  "name": "ci-prompt-evaluation-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated LLM evaluation using Promptfoo, Gemini and GitHub Actions",
+  "scripts": {
+    "eval": "promptfoo eval --no-cache",
+    "view": "promptfoo view"
+  },
+  "devDependencies": {
+    "promptfoo": "latest"
+  }
+}

@@ -1,0 +1,38 @@
+apiVersion: keda.sh/v1alpha1
+
+kind: ScaledObject
+
+metadata:
+  name: gemini-worker-scaler
+
+spec:
+
+  scaleTargetRef:
+    name: gemini-worker
+
+
+  pollingInterval: 5
+
+
+  cooldownPeriod: 30
+
+
+  minReplicaCount: 1
+
+
+  maxReplicaCount: 5
+
+
+  triggers:
+
+    - type: redis
+
+      metadata:
+
+        address: redis:6379
+
+        listName: llm_jobs
+
+        listLength: "5"
+
+        activationListLength: "1"

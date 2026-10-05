@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: gemini-worker
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: gemini-worker
+
+  template:
+    metadata:
+      labels:
+        app: gemini-worker
+
+    spec:
+      containers:
+        - name: worker
+          image: ridhi11/gemini-keda-worker:1.0
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-api-secret
+                  key: GEMINI_API_KEY
+
+            - name: REDIS_HOST
+              value: "redis"
+
+            - name: REDIS_PORT
+              value: "6379"
+
+            - name: QUEUE_NAME
+              value: "llm_jobs"
+
+            - name: RESULTS_NAME
+              value: "llm_results"
+
+            - name: MODEL_NAME
+              value: "gemini-3.5-flash-lite"

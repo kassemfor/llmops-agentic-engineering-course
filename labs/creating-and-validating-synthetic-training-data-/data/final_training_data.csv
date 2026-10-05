@@ -1,0 +1,19 @@
+id,text,label,source
+1,I was charged twice for my subscription.,billing,original
+2,My payment was declined even though my card is valid.,billing,original
+3,The application keeps crashing when I open it.,technical,original
+4,I cannot connect to the service after the latest update.,technical,original
+5,I forgot my password and cannot access my account.,account,original
+6,I need to change the email address linked to my account.,account,original
+7,Why is my monthly invoice higher than expected?,billing,synthetic
+8,I would like to request a refund for my recent purchase.,billing,synthetic
+9,My subscription renewal failed to process.,billing,synthetic
+10,Can you provide me with a summary of my recent charges?,billing,synthetic
+11,The software interface is not rendering correctly on my screen.,technical,synthetic
+12,I am receiving a persistent error code when trying to upload files.,technical,synthetic
+13,The platform is running extremely slowly today.,technical,synthetic
+14,How do I clear the cache to fix this display issue?,technical,synthetic
+15,I am unable to log in despite using the correct credentials.,account,synthetic
+16,How can I permanently deactivate my profile?,account,synthetic
+17,I need to update my security settings for better protection.,account,synthetic
+18,My profile information is not updating after I saved the changes.,account,synthetic

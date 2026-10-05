@@ -1,0 +1,28 @@
+services:
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-service
+
+    ports:
+      - "11434:11434"
+
+    volumes:
+      - ollama_data:/root/.ollama
+
+  app:
+    build: .
+    container_name: llm-app
+
+    environment:
+      OLLAMA_URL: http://ollama:11434/api/generate
+      OLLAMA_MODEL: llama3.2:3b
+
+    depends_on:
+      - ollama
+
+    stdin_open: true
+    tty: true
+
+volumes:
+  ollama_data:

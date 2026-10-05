@@ -1,0 +1,73 @@
+text
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I cannot connect to the service.
+
+### Response:
+Please verify your internet connection and restart the application. If the service remains unavailable, check the service status or contact technical support."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I need to change my account email.
+
+### Response:
+Open your account settings and update the registered email address. You may be asked to verify the new email before the change is completed."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I want to update my payment method.
+
+### Response:
+You can update your payment method from the billing section of your account settings. Save the new details before making your next payment."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+My payment keeps getting declined.
+
+### Response:
+Please verify that your payment details are correct and that sufficient funds are available. If the issue continues, contact your payment provider or billing support."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+The latest update broke one of the features.
+
+### Response:
+Please restart the application after the update and verify that you are running the latest release. If the feature remains unavailable, report the issue to technical support."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I forgot my password.
+
+### Response:
+Use the Forgot Password option on the login page to request a password-reset link and follow the instructions sent to your registered email address."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+The application is running very slowly.
+
+### Response:
+Try restarting the application and closing unnecessary background programs. If performance remains slow, check your network connection and update the application."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+I cannot log in to my account.
+
+### Response:
+Please verify your login credentials and try resetting your password. If you still cannot access the account, contact account support."
+"### Instruction:
+Respond to the customer support request.
+
+### Customer:
+The application crashes when I open it.
+
+### Response:
+Please restart the application and ensure that you are using the latest version. If the problem continues, reinstall the application or contact technical support."

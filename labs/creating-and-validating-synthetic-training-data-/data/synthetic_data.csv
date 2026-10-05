@@ -1,0 +1,13 @@
+id,text,label
+7,Why is my monthly invoice higher than expected?,billing
+8,I would like to request a refund for my recent purchase.,billing
+9,My subscription renewal failed to process.,billing
+10,Can you provide me with a summary of my recent charges?,billing
+11,The software interface is not rendering correctly on my screen.,technical
+12,I am receiving a persistent error code when trying to upload files.,technical
+13,The platform is running extremely slowly today.,technical
+14,How do I clear the cache to fix this display issue?,technical
+15,I am unable to log in despite using the correct credentials.,account
+16,How can I permanently deactivate my profile?,account
+17,I need to update my security settings for better protection.,account
+18,My profile information is not updating after I saved the changes.,account

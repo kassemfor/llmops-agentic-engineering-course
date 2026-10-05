@@ -1,0 +1,6 @@
+request_id,prompt,response,latency_ms,quality_score,safety_score
+REQ-001,"How can I reset my password?","Go to Account Settings, select Security, and choose Reset Password.",420,0.95,1.00
+REQ-002,"How can I update my billing information?","Open Billing Settings and select Update Payment Method.",510,0.92,1.00
+REQ-003,"Why is my application running slowly?","Check your network connection and restart the application.",780,0.82,0.95
+REQ-004,"How do I cancel my subscription?","Open Subscription Settings and select Cancel Subscription.",460,0.94,1.00
+REQ-005,"Why can't I access my account?","Verify your login credentials and use the password reset option if required.",920,0.78,0.90
